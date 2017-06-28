@@ -4,28 +4,44 @@ import (
 	"github.com/spf13/viper"
 )
 
-// MQTTMapping ...
-type MQTTMapping struct {
+type littleflyConfiguration struct {
+	Workers int
+}
+
+type mQTTConfiguration struct {
+	Host     string
+	Port     string
+	ClientID string
+}
+
+type influxDBConfiguration struct {
+	Host string
+	Port string
+}
+
+type mQTTMappingConfiguration struct {
 	Topic string
 }
 
-// InfluxDBMapping ...
-type InfluxDBMapping struct {
+type influxDBMappingConfiguration struct {
 	Database    string
 	Measurement string
-	Tags        []string
+	Tags        map[string]string
 }
 
-// Mapping ...
-type Mapping struct {
+// MappingConfiguration ...
+type MappingConfiguration struct {
 	Name     string
-	MQTT     MQTTMapping
-	InfluxDB InfluxDBMapping
+	MQTT     mQTTMappingConfiguration
+	InfluxDB influxDBMappingConfiguration
 }
 
 // Config ...
 type Config struct {
-	Mappings []Mapping
+	Littlefly littleflyConfiguration
+	MQTT      mQTTConfiguration
+	InfluxDB  influxDBConfiguration
+	Mappings  []MappingConfiguration
 }
 
 // GetConfig ...

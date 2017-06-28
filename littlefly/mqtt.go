@@ -15,45 +15,35 @@ import (
 // MQTTMessage ...
 type MQTTMessage struct {
 	MQTT.Message
-	Mapping
+	MappingConfiguration
 }
 
-// MQTTConfig ...
-func MQTTConfig() map[string]interface{} {
+func mQTTConfig() map[string]interface{} {
 	return viper.GetStringMap("mqtt")
 }
 
-// MQTTCBrokerURI ...
-func MQTTCBrokerURI() string {
-	return fmt.Sprintf("tcp://%s:%s", MQTTConfig()["host"], MQTTConfig()["port"])
+func mQTTCBrokerURI() string {
+	return fmt.Sprintf("tcp://%s:%s", mQTTConfig()["host"], mQTTConfig()["port"])
 }
 
-// MQTTClientID ...
-func MQTTClientID() string {
-	return MQTTConfig()["client_id"].(string)
+func mQTTClientID() string {
+	return mQTTConfig()["client_id"].(string)
 }
 
-// MQTTUsername ...
-func MQTTUsername() string {
+func mQTTUsername() string {
 	var u interface{}
-	if u = MQTTConfig()["username"]; err != nil {
+	if u = mQTTConfig()["username"]; err != nil {
 		return u.(string)
 	}
 	return ""
 }
 
-// MQTTPassword ...
-func MQTTPassword() string {
+func mQTTPassword() string {
 	var p interface{}
-	if p = MQTTConfig()["password"]; err != nil {
+	if p = mQTTConfig()["password"]; err != nil {
 		return p.(string)
 	}
 	return ""
-}
-
-// MQTTTopic ...
-func MQTTTopic() string {
-	return MQTTConfig()["topic"].(string)
 }
 
 var outgoing chan *MQTTMessage
@@ -71,13 +61,13 @@ func MQTTSubscribe(incoming chan *MQTTMessage) {
 	}()
 
 	opts := &MQTT.ClientOptions{
-		ClientID:  MQTTClientID(),
-		Username:  MQTTUsername(),
-		Password:  MQTTPassword(),
+		ClientID:  mQTTClientID(),
+		Username:  mQTTUsername(),
+		Password:  mQTTPassword(),
 		TLSConfig: tls.Config{InsecureSkipVerify: true, ClientAuth: tls.NoClientCert},
 	}
 
-	opts.AddBroker(MQTTCBrokerURI())
+	opts.AddBroker(mQTTCBrokerURI())
 
 	opts.OnConnect = func(c MQTT.Client) {
 		for _, mapping := range GetConfig().Mappings {
@@ -85,7 +75,7 @@ func MQTTSubscribe(incoming chan *MQTTMessage) {
 			var f MQTT.MessageHandler = func(client MQTT.Client, msg MQTT.Message) {
 				outgoing <- &MQTTMessage{msg, m}
 			}
-			c.AddRoute(mapping.MQTT.Topic, f)
+			c.Subscribe(mapping.MQTT.Topic, 0, f)
 		}
 	}
 

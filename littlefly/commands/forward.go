@@ -18,16 +18,16 @@ func init() {
 }
 
 func forwardMessages() {
-	// influxDB, _ := littlefly.NewInfluxDBConnection()
+	influxDB, _ := littlefly.NewInfluxDBConnection()
 
 	incoming := make(chan *littlefly.MQTTMessage)
+	forward := make(chan *littlefly.MQTTMessage)
+
+	go littlefly.CreateWorkers(influxDB, forward)
 	go littlefly.MQTTSubscribe(incoming)
 
 	for m := range incoming {
 		littlefly.LogMQTTMessage(m)
-		// p := littlefly.InfluxDBPoint{
-		//   Value: string(m.Payload())
-		// }
-		// influxDB.Forward(&p)
+		forward <- m
 	}
 }

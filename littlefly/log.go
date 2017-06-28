@@ -60,8 +60,8 @@ func DebugLog(line ...interface{}) {
 func LogMQTTMessage(m *MQTTMessage) {
 	fields := logrus.Fields{
 		"topic":    m.Topic(),
-		"mqtt":     m.Mapping.MQTT,
-		"influxdb": m.Mapping.InfluxDB,
+		"mqtt":     m.MappingConfiguration.MQTT,
+		"influxdb": m.MappingConfiguration.InfluxDB,
 	}
 	Log.WithFields(fields).Info(string(m.Payload()))
 }
