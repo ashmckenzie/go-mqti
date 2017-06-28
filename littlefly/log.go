@@ -13,6 +13,8 @@ var Log = logrus.New()
 
 // DiskLog ...
 var DiskLog *logrus.Logger
+
+// DiskLogFile ...
 var DiskLogFile *os.File
 
 const debugDiskFile string = "/tmp/littlefly-debug.log"
@@ -46,14 +48,25 @@ func setLogLevelFor(l *logrus.Logger, level logrus.Level) {
 	l.Level = level
 }
 
+// DebugLog ...
 func DebugLog(line ...interface{}) {
 	if DiskLog != nil {
-		logIt(DiskLog, logrus.DebugLevel, line)
+		debugLogIt(DiskLog, logrus.DebugLevel, line)
 		// DiskLogFile.Sync()
 	}
 }
 
-func logIt(l *logrus.Logger, level logrus.Level, msg ...interface{}) {
+// LogMQTTMessage ...
+func LogMQTTMessage(m *MQTTMessage) {
+	fields := logrus.Fields{
+		"topic":    m.Topic(),
+		"mqtt":     m.Mapping.MQTT,
+		"influxdb": m.Mapping.InfluxDB,
+	}
+	Log.WithFields(fields).Info(string(m.Payload()))
+}
+
+func debugLogIt(l *logrus.Logger, level logrus.Level, msg ...interface{}) {
 	pc, _, _, _ := runtime.Caller(2)
 	details := runtime.FuncForPC(pc)
 	fileFunc, lineFunc := details.FileLine(pc)
