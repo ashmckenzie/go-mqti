@@ -1,0 +1,23 @@
+mosquitto:
+  image: toke/mosquitto
+  ports:
+    - "1883:1883"
+    - "9001:9001"
+
+influxdb:
+  image: influxdb:latest
+  container_name: influxdb
+  environment:
+    INFLUXDB_ADMIN_ENABLED: "true"
+  ports:
+    - "8083:8083"
+    - "8086:8086"
+    - "8090:8090"
+
+grafana:
+  image: grafana/grafana:latest
+  container_name: grafana
+  ports:
+    - "3000:3000"
+  links:
+    - influxdb
