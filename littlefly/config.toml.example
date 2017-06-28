@@ -1,0 +1,10 @@
+[mqtt]
+host = 'localhost'
+port = 1883
+topic = 'mqtt'
+client_id = 'littlefly'
+
+[influxdb]
+host = 'localhost'
+port = 8086
+database = 'mqtt'
