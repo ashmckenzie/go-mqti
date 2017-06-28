@@ -1,10 +1,29 @@
+[littlefly]
+workers = 4
+
 [mqtt]
-host = 'localhost'
-port = 1883
-topic = 'mqtt'
-client_id = 'littlefly'
+host = "localhost"
+port = "1883"
+client_id = "littlefly"
 
 [influxdb]
-host = 'localhost'
-port = 8086
-database = 'mqtt'
+host = "localhost"
+port = "8086"
+
+[[mappings]]
+  name = "temperature"
+  [mappings.mqtt]
+    topic = "temperature"
+  [mappings.influxdb]
+    database = "iot"
+    measurement = "current"
+    [[mappings.influxdb.tags]]
+      key = "value"
+
+[[mappings]]
+  name = "voltage"
+  [mappings.mqtt]
+    topic = "voltage"
+  [mappings.influxdb]
+    database = "iot"
+    measurement = "current"
