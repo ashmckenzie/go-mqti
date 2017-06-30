@@ -1,4 +1,4 @@
-littlefly
+mqti
 =========
 
 [![Build Status](https://travis-ci.org/ashmckenzie/go-litlefly.svg?branch=master)](https://travis-ci.org/ashmckenzie/go-litlefly)
@@ -15,26 +15,37 @@ Configuration
 Configuration is handled through a `config.toml` file.  Example:
 
 ```
+[mqti]
+workers = 4
+
 [mqtt]
-host = 'localhost'
-port = 1883
-topic = 'mqtt'
-client_id = 'littlefly'
+host = "localhost"
+port = "1883"
+client_id = "mqti"
 
 [influxdb]
-host = 'localhost'
-port = 8086
-database = 'mqtt'
+host = "localhost"
+port = "8086"
+
+[[mappings]]
+  name = "temperature"
+  [mappings.mqtt]
+    topic = "temperature"
+  [mappings.influxdb]
+    database = "iot"
+    measurement = "current"
+    [[mappings.influxdb.tags]]
+      key = "value"
 ```
 
 Install
 -------
 
-`go get github.com/ashmckenzie/go-littlefly/littlefly`
+`go get github.com/ashmckenzie/go-mqti/mqti`
 
 or download a release:
 
-https://github.com/ashmckenzie/go-littlefly/releases
+https://github.com/ashmckenzie/go-mqti/releases
 
 License
 -------

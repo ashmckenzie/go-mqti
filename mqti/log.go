@@ -1,4 +1,4 @@
-package littlefly
+package mqti
 
 import (
 	"fmt"
@@ -17,7 +17,8 @@ var DiskLog *logrus.Logger
 // DiskLogFile ...
 var DiskLogFile *os.File
 
-const debugDiskFile string = "/tmp/littlefly-debug.log"
+// DEBUGDISKFILE ...
+const DEBUGDISKFILE string = "/tmp/ofr-debug.log"
 
 func init() {
 	setupStderrLogging()
@@ -28,11 +29,11 @@ func EnableDebugging(yes bool) {
 	var err error
 
 	if yes {
-		Log.Warnf("Debugging output will go to %s", debugDiskFile)
+		Log.Infof("Debugging output will go to %s", DEBUGDISKFILE)
 		DiskLog = logrus.New()
-		DiskLog.Formatter = &logrus.JSONFormatter{}
 		setLogLevelFor(DiskLog, logrus.DebugLevel)
-		if DiskLogFile, err = os.OpenFile(debugDiskFile, os.O_CREATE|os.O_WRONLY, 0640); err != nil {
+		DiskLog.Formatter = &logrus.JSONFormatter{}
+		if DiskLogFile, err = os.OpenFile(DEBUGDISKFILE, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600); err != nil {
 			Log.Panic(err)
 		}
 		DiskLog.Out = DiskLogFile
@@ -51,8 +52,7 @@ func setLogLevelFor(l *logrus.Logger, level logrus.Level) {
 // DebugLog ...
 func DebugLog(line ...interface{}) {
 	if DiskLog != nil {
-		debugLogIt(DiskLog, logrus.DebugLevel, line)
-		// DiskLogFile.Sync()
+		logIt(DiskLog, logrus.DebugLevel, line)
 	}
 }
 
@@ -66,7 +66,7 @@ func LogMQTTMessage(m *MQTTMessage) {
 	Log.WithFields(fields).Info(string(m.Payload()))
 }
 
-func debugLogIt(l *logrus.Logger, level logrus.Level, msg ...interface{}) {
+func logIt(l *logrus.Logger, level logrus.Level, msg ...interface{}) {
 	pc, _, _, _ := runtime.Caller(2)
 	details := runtime.FuncForPC(pc)
 	fileFunc, lineFunc := details.FileLine(pc)

@@ -1,4 +1,4 @@
-package littlefly
+package mqti
 
 //go:generate bash ../scripts/update_version.sh
 

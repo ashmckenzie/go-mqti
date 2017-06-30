@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/ashmckenzie/go-littlefly/littlefly"
+	"github.com/ashmckenzie/go-mqti/mqti"
 	"github.com/spf13/cobra"
 )
 
@@ -18,10 +18,10 @@ func init() {
 }
 
 func watchMessages() {
-	incoming := make(chan *littlefly.MQTTMessage)
-	go littlefly.MQTTSubscribe(incoming)
+	incoming := make(chan *mqti.MQTTMessage)
+	go mqti.MQTTSubscribe(incoming)
 
 	for m := range incoming {
-		littlefly.LogMQTTMessage(m)
+		mqti.LogMQTTMessage(m)
 	}
 }

@@ -1,10 +1,10 @@
-package littlefly
+package mqti
 
 import (
 	"github.com/spf13/viper"
 )
 
-type littleflyConfiguration struct {
+type mQtiConfiguration struct {
 	Workers int
 }
 
@@ -38,16 +38,18 @@ type MappingConfiguration struct {
 
 // Config ...
 type Config struct {
-	Littlefly littleflyConfiguration
-	MQTT      mQTTConfiguration
-	InfluxDB  influxDBConfiguration
-	Mappings  []MappingConfiguration
+	MQti     mQtiConfiguration
+	MQTT     mQTTConfiguration
+	InfluxDB influxDBConfiguration
+	Mappings []MappingConfiguration
 }
 
 // GetConfig ...
-func GetConfig() *Config {
+func GetConfig() (*Config, error) {
 	var c Config
-	viper.Unmarshal(&c)
+	if err := viper.Unmarshal(&c); err != nil {
+		return nil, err
+	}
 
-	return &c
+	return &c, err
 }

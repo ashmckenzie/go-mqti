@@ -1,10 +1,10 @@
-[littlefly]
+[mqti]
 workers = 4
 
 [mqtt]
 host = "localhost"
 port = "1883"
-client_id = "littlefly"
+client_id = "mqti"
 
 [influxdb]
 host = "localhost"

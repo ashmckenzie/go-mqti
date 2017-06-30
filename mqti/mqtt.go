@@ -1,4 +1,4 @@
-package littlefly
+package mqti
 
 import (
 	"crypto/tls"
@@ -65,6 +65,7 @@ var outgoing chan *MQTTMessage
 
 // MQTTSubscribe ...
 func MQTTSubscribe(incoming chan *MQTTMessage) {
+
 	outgoing = incoming
 
 	cs := make(chan os.Signal, 1)
@@ -89,7 +90,15 @@ func MQTTSubscribe(incoming chan *MQTTMessage) {
 	opts.AddBroker(mQTTCBrokerURI())
 
 	opts.OnConnect = func(c MQTT.Client) {
-		for _, mapping := range GetConfig().Mappings {
+		var err error
+		var config *Config
+
+		config, err = GetConfig()
+		if err != nil {
+			Log.Fatal(err)
+		}
+
+		for _, mapping := range config.Mappings {
 			m := mapping
 			var f MQTT.MessageHandler = func(client MQTT.Client, msg MQTT.Message) {
 				outgoing <- &MQTTMessage{msg, m}

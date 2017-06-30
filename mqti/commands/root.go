@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ashmckenzie/go-littlefly/littlefly"
+	"github.com/ashmckenzie/go-mqti/mqti"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -14,7 +14,7 @@ var debug, showVersion bool
 
 // RootCmd ...
 var RootCmd = &cobra.Command{
-	Use:           "littlefly",
+	Use:           "mqti",
 	Short:         "MQTT subscriber that pumps data into InfluxDB",
 	Long:          `MQTT subscriber that pumps data into InfluxDB`,
 	SilenceErrors: true,
@@ -23,13 +23,13 @@ var RootCmd = &cobra.Command{
 			return err
 		}
 
-		littlefly.EnableDebugging(debug)
+		mqti.EnableDebugging(debug)
 
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		if showVersion {
-			fmt.Println(littlefly.Version)
+			fmt.Println(mqti.Version)
 		}
 		cmd.Help()
 	},
@@ -65,7 +65,7 @@ func initConfig() {
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
-		littlefly.Log.Fatal("Can't read config:", err)
+		mqti.Log.Fatal("Can't read config:", err)
 		os.Exit(1)
 	}
 }

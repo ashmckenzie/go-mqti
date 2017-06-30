@@ -1,4 +1,4 @@
-PROJECT_NAME ?= littlefly
+PROJECT_NAME ?= mqti
 VERSION=$(shell cat VERSION)
 
 BUILD_IMAGE_NAME = $(PROJECT_NAME)-build
@@ -37,10 +37,17 @@ release_upload: release
 	github-release upload ${GITHUB_RELEASE_ARGS} --name ${LINUX_RELEASE} --file ${RELEASE_DIR}/${LINUX_RELEASE}
 
 test: deps
+	go tool vet *.go cmd/*.go commands/*.go
+	errcheck
 	go test -cover
+
+report: deps
+	mkdir -p reports
+	goreporter -p ../ofr -r ../ofr/reports/ -e vendor
 
 deps: make_dirs
 	go get github.com/kardianos/govendor
+	go get github.com/kisielk/errcheck
 	go get github.com/aktau/github-release
 	govendor fetch +missing
 	go generate -v -x ./ ./cmd ./commands

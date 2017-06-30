@@ -3,7 +3,7 @@ version=`cat VERSION`
 
 # Write out the package.
 cat << EOF > version.go
-package littlefly
+package mqti
 
 //go:generate bash ../scripts/update_version.sh
 

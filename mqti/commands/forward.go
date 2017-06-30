@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/ashmckenzie/go-littlefly/littlefly"
+	"github.com/ashmckenzie/go-mqti/mqti"
 	"github.com/spf13/cobra"
 )
 
@@ -18,16 +18,16 @@ func init() {
 }
 
 func forwardMessages() {
-	influxDB, _ := littlefly.NewInfluxDBConnection()
+	influxDB, _ := mqti.NewInfluxDBConnection()
 
-	incoming := make(chan *littlefly.MQTTMessage)
-	forward := make(chan *littlefly.MQTTMessage)
+	incoming := make(chan *mqti.MQTTMessage)
+	forward := make(chan *mqti.MQTTMessage)
 
-	go littlefly.CreateWorkers(influxDB, forward)
-	go littlefly.MQTTSubscribe(incoming)
+	go mqti.CreateWorkers(influxDB, forward)
+	go mqti.MQTTSubscribe(incoming)
 
 	for m := range incoming {
-		littlefly.LogMQTTMessage(m)
+		mqti.LogMQTTMessage(m)
 		forward <- m
 	}
 }
