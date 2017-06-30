@@ -23,7 +23,14 @@ func mQTTConfig() map[string]interface{} {
 }
 
 func mQTTCBrokerURI() string {
-	return fmt.Sprintf("tcp://%s:%s", mQTTConfig()["host"], mQTTConfig()["port"])
+	return fmt.Sprintf("%s://%s:%s", mQTTProtocol(), mQTTConfig()["host"], mQTTConfig()["port"])
+}
+
+func mQTTProtocol() string {
+	if mQTTTLSDefined() {
+		return "ssl"
+	}
+	return "tcp"
 }
 
 func mQTTClientID() string {
@@ -31,19 +38,27 @@ func mQTTClientID() string {
 }
 
 func mQTTUsername() string {
-	var u interface{}
-	if u = mQTTConfig()["username"]; err != nil {
+	u := mQTTConfig()["username"]
+	if u != nil {
 		return u.(string)
 	}
 	return ""
 }
 
 func mQTTPassword() string {
-	var p interface{}
-	if p = mQTTConfig()["password"]; err != nil {
+	p := mQTTConfig()["password"]
+	if p != nil {
 		return p.(string)
 	}
 	return ""
+}
+
+func mQTTTLSDefined() bool {
+	return mQTTConfig()["tls_cert"] != nil && mQTTConfig()["tls_private_key"] != nil
+}
+
+func mQTTTLSConfig() tls.Config {
+	return *NewTLSConfig(mQTTConfig()["tls_cert"].(string), mQTTConfig()["tls_private_key"].(string))
 }
 
 var outgoing chan *MQTTMessage
@@ -61,10 +76,14 @@ func MQTTSubscribe(incoming chan *MQTTMessage) {
 	}()
 
 	opts := &MQTT.ClientOptions{
-		ClientID:  mQTTClientID(),
-		Username:  mQTTUsername(),
-		Password:  mQTTPassword(),
-		TLSConfig: tls.Config{InsecureSkipVerify: true, ClientAuth: tls.NoClientCert},
+		AutoReconnect: true,
+		ClientID:      mQTTClientID(),
+		Username:      mQTTUsername(),
+		Password:      mQTTPassword(),
+	}
+
+	if mQTTTLSDefined() {
+		opts.TLSConfig = mQTTTLSConfig()
 	}
 
 	opts.AddBroker(mQTTCBrokerURI())
