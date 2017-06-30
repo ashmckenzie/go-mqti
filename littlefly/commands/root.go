@@ -31,6 +31,7 @@ var RootCmd = &cobra.Command{
 		if showVersion {
 			fmt.Println(littlefly.Version)
 		}
+		cmd.Help()
 	},
 }
 
