@@ -29,7 +29,7 @@ func EnableDebugging(yes bool) {
 	var err error
 
 	if yes {
-		Log.Infof("Debugging output will go to %s", DEBUGDISKFILE)
+		// Log.Infof("Debugging output will go to %s", DEBUGDISKFILE)
 		DiskLog = logrus.New()
 		setLogLevelFor(Log, logrus.DebugLevel)
 		setLogLevelFor(DiskLog, logrus.DebugLevel)
