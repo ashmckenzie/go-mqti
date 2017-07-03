@@ -27,7 +27,7 @@ func forwardMessages() {
 	go mqti.MQTTSubscribe(incoming)
 
 	for m := range incoming {
-		mqti.LogMQTTMessage(m)
+		mqti.DebugLogMQTTMessage(m)
 		forward <- m
 	}
 }
