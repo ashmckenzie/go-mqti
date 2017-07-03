@@ -25,7 +25,7 @@ run: test
 
 release: make_dirs test
 	# FIXME
-	# CGO_ENABLED=0 GOOS=darwin go build -a -installsuffix cgo ${BUILD_ARGS} -o ${RELEASE_DIR}/${DARWIN_RELEASE} ./cmd
+	CGO_ENABLED=0 GOOS=darwin go build -a -installsuffix cgo ${BUILD_ARGS} -o ${RELEASE_DIR}/${DARWIN_RELEASE} ./cmd
 	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo ${BUILD_ARGS} -o ${RELEASE_DIR}/${LINUX_RELEASE} ./cmd
 
 release_upload: release
