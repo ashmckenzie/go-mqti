@@ -17,6 +17,8 @@ influxdb:
 grafana:
   image: grafana/grafana:latest
   container_name: grafana
+  environment:
+    GF_INSTALL_PLUGINS: "grafana-worldmap-panel"
   ports:
     - "3000:3000"
   links:
