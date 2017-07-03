@@ -31,6 +31,7 @@ func EnableDebugging(yes bool) {
 	if yes {
 		Log.Infof("Debugging output will go to %s", DEBUGDISKFILE)
 		DiskLog = logrus.New()
+		setLogLevelFor(Log, logrus.DebugLevel)
 		setLogLevelFor(DiskLog, logrus.DebugLevel)
 		DiskLog.Formatter = &logrus.JSONFormatter{}
 		if DiskLogFile, err = os.OpenFile(DEBUGDISKFILE, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600); err != nil {
@@ -58,12 +59,28 @@ func DebugLog(line ...interface{}) {
 
 // LogMQTTMessage ...
 func LogMQTTMessage(m *MQTTMessage) {
+	logMQTTMessage(m, logrus.InfoLevel)
+}
+
+// DebugLogMQTTMessage ...
+func DebugLogMQTTMessage(m *MQTTMessage) {
+	logMQTTMessage(m, logrus.DebugLevel)
+}
+
+func logMQTTMessage(m *MQTTMessage, level logrus.Level) {
+	payload := string(m.Payload())
 	fields := logrus.Fields{
 		"topic":    m.Topic(),
 		"mqtt":     m.MappingConfiguration.MQTT,
 		"influxdb": m.MappingConfiguration.InfluxDB,
 	}
-	Log.WithFields(fields).Info(string(m.Payload()))
+
+	switch level {
+	case logrus.InfoLevel:
+		Log.WithFields(fields).Info(payload)
+	case logrus.DebugLevel:
+		Log.WithFields(fields).Debug(payload)
+	}
 }
 
 func logIt(l *logrus.Logger, level logrus.Level, msg ...interface{}) {
