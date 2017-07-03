@@ -1,54 +1,108 @@
-mqti
-=========
+# mqti
 
-[![Build Status](https://travis-ci.org/ashmckenzie/go-litlefly.svg?branch=master)](https://travis-ci.org/ashmckenzie/go-litlefly)
+[![Build Status](https://travis-ci.org/ashmckenzie/go-mqti.svg?branch=master)](https://travis-ci.org/ashmckenzie/go-mqti)
 
 MQTT subscriber that pumps data into InfluxDB.
 
+Pronounced 'm-cutey' :)
+
+## Features
+
+* MQTT 3.1.1 supported, TLS, username/password
+* Consume MQTT messages and inspect (`watch`) or `forward` with the following abilities:
+  * Filter messages with AND + OR
+* Receive MQTT messages and write into InfluxDB, with the following abilities:
+  * Add tags based on MQTT fields (when MQTT payload is JSON)
+  * Geohash support (applicable when consuming MQTT messages from [Owntracks](http://owntracks.org/)
+* Includes `docker-compose.yaml` to get a full setup up and running!
+
+## Configuration
+
+Configuration is handled through a `config.yaml` file.  The following example reads as:
+
+* Setup four workers for incoming MQTT messages
+* Consume message from MQTT server `tcp://localhost:1883` with the client ID of `mqti`
+* When a MQTT message is consumed from the `temperature` topic, send write requests to InfluxDB server `http://localhost:8086`, into the `iot` database as measurement `temperature`
+
+```yaml
+---
+mqti:
+  workers: 4
+
+mqtt:
+  host: "localhost"
+  port: "1883"
+  client_id: "mqti"
+
+influxdb:
+  host: "localhost"
+  port: "8086"
+
+mappings:
+  - mqtt:
+      topic: "temperature"
+    influxdb:
+      database: "iot"
+      measurement: "temperature"
 ```
-<USAGE>
-```
 
-Configuration
--------------
-
-Configuration is handled through a `config.toml` file.  Example:
-
-```
-[mqti]
-workers = 4
-
-[mqtt]
-host = "localhost"
-port = "1883"
-client_id = "mqti"
-
-[influxdb]
-host = "localhost"
-port = "8086"
-
-[[mappings]]
-  name = "temperature"
-  [mappings.mqtt]
-    topic = "temperature"
-  [mappings.influxdb]
-    database = "iot"
-    measurement = "current"
-    [[mappings.influxdb.tags]]
-      key = "value"
-```
-
-Install
--------
+## Install
 
 `go get github.com/ashmckenzie/go-mqti/mqti`
 
 or download a release:
 
-https://github.com/ashmckenzie/go-mqti/releases
+[github.com/ashmckenzie/go-mqti/releases](https://github.com/ashmckenzie/go-mqti/releases)
 
-License
--------
+## Usage
+
+1. Ensure you have a `config.yaml` setup (see above)
+
+### To consume MQTT messages only
+
+1. `$GOPATH/bin/mqti watch`
+
+### To consume MQTT messages *and* forward to InfluxDB
+
+1. `$GOPATH/bin/mqti forward`
+
+
+## Help
+
+```shell
+MQTT subscriber that pumps data into InfluxDB
+
+Usage:
+  mqti [flags]
+  mqti [command]
+
+Available Commands:
+  forward     Forward MQTT messages on to InfluxDB
+  watch       Watch MQTT messages
+  help        Help about any command
+
+Flags:
+      --config string   config file (default is config.yaml)
+      --debug           enable debugging
+  -h, --help            help for mqti
+  -v, --version         show version
+
+Use "mqti [command] --help" for more information about a command.
+```
+
+## Building
+
+1. `make`
+
+## Thanks
+
+* [github.com/eclipse/paho.mqtt.golang](https://github.com/eclipse/paho.mqtt.golang)
+* [github.com/influxdata/influxdb/client](https://github.com/influxdata/influxdb/client)
+* [github.com/spf13/cobra](https://github.com/spf13/cobra)
+* [github.com/spf13/viper](https://github.com/spf13/viper)
+* [github.com/Sirupsen/logrus](https://github.com/Sirupsen/logrus)
+
+## License
 
 MIT License
 
