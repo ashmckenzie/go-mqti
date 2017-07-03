@@ -18,7 +18,10 @@ func init() {
 }
 
 func forwardMessages() {
-	influxDB, _ := mqti.NewInfluxDBConnection()
+	influxDB, err := mqti.NewInfluxDBConnection()
+	if err != nil {
+		mqti.Log.Fatal(nil)
+	}
 
 	incoming := make(chan *mqti.MQTTMessage)
 	forward := make(chan *mqti.MQTTMessage)
