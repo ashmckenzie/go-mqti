@@ -29,7 +29,7 @@ mqti:
   image: ashmckenzie/mqti
   container_name: mqti
   volumes:
-    - ./config.yaml:/app/config.yaml:ro
+    - ./docker/config.yaml:/app/config.yaml:ro
   links:
     - influxdb
     - mosquitto
@@ -39,6 +39,6 @@ traffic_generator:
   container_name: traffic_generator
   command: "/bin/bash /app/traffic_generator.sh"
   volumes:
-    - ./traffic_generator.sh:/app/traffic_generator.sh:ro
+    - ./docker/traffic_generator.sh:/app/traffic_generator.sh:ro
   links:
     - mosquitto
