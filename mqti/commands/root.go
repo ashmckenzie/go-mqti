@@ -51,7 +51,7 @@ func init() {
 	RootCmd.Flags().BoolVarP(&showVersion, "version", "v", false, "show version")
 	RootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "enable debugging")
 
-	RootCmd.PersistentFlags().StringVar(&configFile, "config", "", "config file (default is config.toml)")
+	RootCmd.PersistentFlags().StringVar(&configFile, "config", "", "config file (default is config.yaml)")
 }
 
 func initConfig() {
