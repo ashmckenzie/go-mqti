@@ -1,32 +1,45 @@
 package mqti
 
-import (
-	"github.com/spf13/viper"
-)
-
-type mQtiConfiguration struct {
-	Workers int
-}
-
-type mQTTConfiguration struct {
-	Host     string
-	Port     string
-	ClientID string
-}
-
-type influxDBConfiguration struct {
-	Host string
-	Port string
-}
+import "github.com/spf13/viper"
 
 type mQTTMappingConfiguration struct {
-	Topic string
+	Topic   string
+	Mungers struct {
+		Filter FilterMungerConfiguration `mapstructure:"filter"`
+	}
 }
 
 type influxDBMappingConfiguration struct {
 	Database    string
 	Measurement string
 	Tags        map[string]string
+	Mungers     struct {
+		Tags    TagsMungerConfiguration
+		Geohash GeohashMungerConfiguration
+	}
+}
+
+// FilterMungerConfiguration ...
+type FilterMungerConfiguration struct {
+	JSON FilterJSONMungerConfiguration
+}
+
+// FilterJSONMungerConfiguration ...
+type FilterJSONMungerConfiguration struct {
+	And []map[string]string
+	Or  []map[string]string
+}
+
+// TagsMungerConfiguration ...
+type TagsMungerConfiguration struct {
+	From []map[string]string
+}
+
+// GeohashMungerConfiguration ...
+type GeohashMungerConfiguration struct {
+	LatitudeField  string `mapstructure:"lat_field"`
+	LongitudeField string `mapstructure:"lng_field"`
+	ResultField    string `mapstructure:"result_field"`
 }
 
 // MappingConfiguration ...
@@ -46,8 +59,10 @@ type Config struct {
 
 // GetConfig ...
 func GetConfig() (*Config, error) {
+	var err error
 	var c Config
-	if err := viper.Unmarshal(&c); err != nil {
+
+	if err = viper.Unmarshal(&c); err != nil {
 		return nil, err
 	}
 
