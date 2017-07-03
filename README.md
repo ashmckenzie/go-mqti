@@ -1,6 +1,7 @@
 # mqti
 
 [![Build Status](https://travis-ci.org/ashmckenzie/go-mqti.svg?branch=master)](https://travis-ci.org/ashmckenzie/go-mqti)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ashmckenzie/go-mqti)](https://goreportcard.com/report/github.com/ashmckenzie/go-mqti)
 
 MQTT subscriber that pumps data into InfluxDB.
 
