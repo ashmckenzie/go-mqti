@@ -101,6 +101,13 @@ Use "mqti [command] --help" for more information about a command.
 
 1. `make`
 
+### TODO
+
+[ ] Tests
+[ ] Document externals
+[ ] Fully document mungers
+[ ] Leverage viper's default values
+
 ## Thanks
 
 * [github.com/eclipse/paho.mqtt.golang](https://github.com/eclipse/paho.mqtt.golang)
