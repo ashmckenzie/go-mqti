@@ -18,7 +18,7 @@ var DiskLog *logrus.Logger
 var DiskLogFile *os.File
 
 // DEBUGDISKFILE ...
-const DEBUGDISKFILE string = "/tmp/ofr-debug.log"
+const DEBUGDISKFILE string = "/tmp/mqti-debug.log"
 
 func init() {
 	setupStderrLogging()

@@ -43,7 +43,7 @@ test: deps
 
 report: deps
 	mkdir -p reports
-	goreporter -p ../ofr -r ../ofr/reports/ -e vendor
+	goreporter -p ../mqti -r ../mqti/reports/ -e vendor
 
 deps: make_dirs
 	go get github.com/kardianos/govendor
