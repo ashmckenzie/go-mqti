@@ -1,0 +1,27 @@
+---
+mqti:
+  workers: 4
+
+mqtt:
+  host: "localhost"
+  port: "1883"
+  client_id: "mqti"
+
+influxdb:
+  host: "localhost"
+  port: "8086"
+
+mappings:
+  - mqtt:
+      topic: "temperature"
+    influxdb:
+      database: "iot"
+      measurement: "temperature"
+      tags:
+        - something: "here"
+
+  - mqtt:
+      topic: "voltage"
+      influxdb:
+        database: "iot"
+        measurement: "voltage"
