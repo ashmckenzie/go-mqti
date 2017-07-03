@@ -18,4 +18,6 @@ bin/
 release/
 vendor/
 tmp/
+reports
 config*.toml
+config*.yaml
