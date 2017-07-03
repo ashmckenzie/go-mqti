@@ -67,6 +67,12 @@ or download a release:
 
 1. `$GOPATH/bin/mqti forward`
 
+## Trying out with Docker
+
+Ensure you're into the root directory and then type in `make run`
+
+* InfluxDB UI http://localhost:8083/ (root/root)
+* Grafana http://localhost:3000/ (admin/admin)
 
 ## Help
 
