@@ -19,5 +19,5 @@ release/
 vendor/
 tmp/
 reports
-config*.toml
-config*.yaml
+mqti/config*.toml
+mqti/config*.yaml
