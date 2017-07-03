@@ -103,10 +103,10 @@ Use "mqti [command] --help" for more information about a command.
 
 ### TODO
 
-[ ] Tests
-[ ] Document externals
-[ ] Fully document mungers
-[ ] Leverage viper's default values
+* [ ] Tests
+* [ ] Document externals
+* [ ] Fully document mungers
+* [ ] Leverage viper's default values
 
 ## Thanks
 
