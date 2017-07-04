@@ -17,5 +17,3 @@ mappings:
     influxdb:
       database: "iot"
       measurement: "temperature"
-      tags:
-        - something: "here"
