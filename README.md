@@ -10,6 +10,7 @@ Pronounced 'm-cutey' :)
 ## Features
 
 * MQTT 3.1.1 supported, TLS, username/password
+* InfluxDB with TLS, username/password
 * Consume MQTT messages and inspect (`watch`) or `forward` with the following abilities:
   * Filter messages with AND + OR
 * Receive MQTT messages and write into InfluxDB, with the following abilities:
@@ -69,10 +70,7 @@ or download a release:
 
 ## Trying out with Docker
 
-Ensure you're into the root directory and then type in `make run`
-
-* InfluxDB UI http://localhost:8083/ (root/root)
-* Grafana http://localhost:3000/ (admin/admin)
+See the [getting starting](https://github.com/ashmckenzie/golang-melbourne-july-2017#getting-started) section of a Golang Melbourne presentation for a full demonstration :)
 
 ## Help
 
