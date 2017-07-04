@@ -19,9 +19,3 @@ mappings:
       measurement: "temperature"
       tags:
         - something: "here"
-
-  - mqtt:
-      topic: "voltage"
-      influxdb:
-        database: "iot"
-        measurement: "voltage"
