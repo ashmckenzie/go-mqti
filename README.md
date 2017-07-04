@@ -7,6 +7,10 @@ MQTT subscriber that pumps data into InfluxDB.
 
 Pronounced 'm-cutey' :)
 
+## How it works
+
+![Architecture](./architecture.png)
+
 ## Features
 
 * MQTT 3.1.1 supported, TLS, username/password
