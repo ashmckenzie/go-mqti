@@ -70,7 +70,7 @@ or download a release:
 
 ## Trying out with Docker
 
-See the [getting starting](https://github.com/ashmckenzie/golang-melbourne-july-2017#getting-started) section of a Golang Melbourne presentation for a full demonstration :)
+See the [getting started](https://github.com/ashmckenzie/golang-melbourne-july-2017#getting-started) section of a Golang Melbourne presentation for a full demonstration :)
 
 ## Help
 
