@@ -142,9 +142,11 @@ func MQTTSubscribe(incoming chan *MQTTMessage) {
 	}()
 
 	opts := &MQTT.ClientOptions{
-		ClientID: mQTTClientID(),
-		Username: mQTTUsername(),
-		Password: mQTTPassword(),
+		AutoReconnect: true,
+		ClientID:      mQTTClientID(),
+		Username:      mQTTUsername(),
+		Password:      mQTTPassword(),
+		TLSConfig:     tls.Config{},
 	}
 
 	if mQTTTLSDefined() {
