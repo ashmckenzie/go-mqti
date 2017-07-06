@@ -128,11 +128,9 @@ func mQTTTLSConfig() tls.Config {
 	return *NewTLSConfig(mQTTConfig()["tls_cert"].(string), mQTTConfig()["tls_private_key"].(string))
 }
 
-var outgoing chan *MQTTMessage
-
 // MQTTSubscribe ...
 func MQTTSubscribe(incoming chan *MQTTMessage) {
-
+	var outgoing chan *MQTTMessage
 	outgoing = incoming
 
 	cs := make(chan os.Signal, 1)
