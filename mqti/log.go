@@ -2,10 +2,12 @@ package mqti
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"runtime"
 
 	"github.com/Sirupsen/logrus"
+	MQTT "github.com/eclipse/paho.mqtt.golang"
 )
 
 // Log ...
@@ -31,6 +33,12 @@ func EnableDebugging(yes bool) {
 	if yes {
 		// Log.Infof("Debugging output will go to %s", DEBUGDISKFILE)
 		DiskLog = logrus.New()
+
+		MQTT.DEBUG = log.New(os.Stderr, "DEBUG - ", log.LstdFlags)
+		MQTT.CRITICAL = log.New(os.Stderr, "CRITICAL - ", log.LstdFlags)
+		MQTT.WARN = log.New(os.Stderr, "WARN - ", log.LstdFlags)
+		MQTT.ERROR = log.New(os.Stderr, "ERROR - ", log.LstdFlags)
+
 		setLogLevelFor(Log, logrus.DebugLevel)
 		setLogLevelFor(DiskLog, logrus.DebugLevel)
 		DiskLog.Formatter = &logrus.JSONFormatter{}
