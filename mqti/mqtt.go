@@ -130,6 +130,10 @@ func mQTTTLSConfig() tls.Config {
 	return *NewTLSConfig(mQTTConfig()["tls_cert"].(string), mQTTConfig()["tls_private_key"].(string))
 }
 
+func mQTTCleanSession() bool {
+	return mQTTConfig()["clean_session"] != nil && (mQTTConfig()["clean_session"].(bool) == true)
+}
+
 // MQTTSubscribe ...
 func MQTTSubscribe(incoming chan *MQTTMessage) {
 	var outgoing chan *MQTTMessage
@@ -148,6 +152,7 @@ func MQTTSubscribe(incoming chan *MQTTMessage) {
 		ClientID:      mQTTClientID(),
 		Username:      mQTTUsername(),
 		Password:      mQTTPassword(),
+		CleanSession:  mQTTCleanSession(),
 		TLSConfig:     tls.Config{},
 	}
 
