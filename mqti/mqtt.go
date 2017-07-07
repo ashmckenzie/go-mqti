@@ -97,7 +97,7 @@ func mQTTPort() string {
 func mQTTProtocol() string {
 	if p := mQTTConfig()["protocol"]; p != nil {
 		return p.(string)
-}
+	}
 	if mQTTTLSDefined() {
 		return "ssl"
 	}
@@ -149,14 +149,13 @@ func MQTTSubscribe(incoming chan *MQTTMessage) {
 		os.Exit(0)
 	}()
 
-	opts := &MQTT.ClientOptions{
-		AutoReconnect: true,
-		ClientID:      mQTTClientID(),
-		Username:      mQTTUsername(),
-		Password:      mQTTPassword(),
-		CleanSession:  mQTTCleanSession(),
-		TLSConfig:     tls.Config{},
-	}
+	opts := MQTT.NewClientOptions()
+
+	opts.ClientID = mQTTClientID()
+	opts.Username = mQTTUsername()
+	opts.Password = mQTTPassword()
+	opts.CleanSession = mQTTCleanSession()
+	opts.TLSConfig = tls.Config{}
 
 	if mQTTTLSDefined() {
 		opts.TLSConfig = mQTTTLSConfig()
