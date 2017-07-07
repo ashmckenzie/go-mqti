@@ -19,19 +19,20 @@ var RootCmd = &cobra.Command{
 	Long:          `MQTT subscriber that pumps data into InfluxDB`,
 	SilenceErrors: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		if err := validateInput(); err != nil {
-			return err
+		if !showVersion {
+			if err := validateInput(); err != nil {
+				return err
+			}
+			mqti.EnableDebugging(debug)
 		}
-
-		mqti.EnableDebugging(debug)
-
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		if showVersion {
 			fmt.Println(mqti.Version)
+		} else {
+			cmd.Help()
 		}
-		cmd.Help()
 	},
 }
 
@@ -46,8 +47,6 @@ func Execute() error {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
-
 	RootCmd.Flags().BoolVarP(&showVersion, "version", "v", false, "show version")
 	RootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "enable debugging")
 

@@ -9,6 +9,7 @@ var forwardCmd = &cobra.Command{
 	Use:   "forward",
 	Short: "Forward MQTT messages on to InfluxDB",
 	Run: func(cmd *cobra.Command, args []string) {
+		initConfig()
 		forwardMessages()
 	},
 }

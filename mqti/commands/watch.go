@@ -9,6 +9,7 @@ var watchCmd = &cobra.Command{
 	Use:   "watch",
 	Short: "Watch MQTT messages",
 	Run: func(cmd *cobra.Command, args []string) {
+		initConfig()
 		watchMessages()
 	},
 }
