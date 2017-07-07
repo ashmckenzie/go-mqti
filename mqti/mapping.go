@@ -4,6 +4,7 @@ import "github.com/spf13/viper"
 
 type mQTTMappingConfiguration struct {
 	Topic   string
+	LUAFile string `mapstructure:"lua_file"`
 	Mungers struct {
 		Filter FilterMungerConfiguration `mapstructure:"filter"`
 	}

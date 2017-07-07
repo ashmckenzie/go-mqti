@@ -11,6 +11,8 @@ import (
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/spf13/viper"
+	"github.com/yuin/gopher-lua"
+	luajson "layeh.com/gopher-json"
 )
 
 const mQTTDefaultPort string = "1883"
@@ -56,23 +58,52 @@ func (m MQTTMessage) jSONFilterShouldSkip(j map[string]interface{}, f []map[stri
 	return skip
 }
 
-func (m MQTTMessage) shouldSkip() bool {
-	if m.jSONFiltersDefined() {
-		payload, err := m.PayloadAsJSON()
+func luaFileExecMatch(j, f string) bool {
+	var r lua.LBool
+	var ok bool
 
-		if err == nil {
-			jsonFilters := m.MQTT.Mungers.Filter.JSON
-			return m.jSONFilterShouldSkip(payload, jsonFilters.And, false) || m.jSONFilterShouldSkip(payload, jsonFilters.Or, true)
+	L := lua.NewState()
+	luajson.Preload(L)
+	defer L.Close()
+
+	if err := L.DoFile(f); err != nil {
+		panic(err)
+	}
+
+	if err := L.CallByParam(lua.P{
+		Fn:      L.GetGlobal("match"),
+		NRet:    1,
+		Protect: true,
+	}, lua.LString(j)); err != nil {
+		panic(err)
+	}
+
+	if r, ok = L.Get(-1).(lua.LBool); ok {
+		if r {
+			return true
 		}
-
-		return true
 	}
 
 	return false
 }
 
-func (m MQTTMessage) jSONFiltersDefined() bool {
-	return (len(m.MQTT.Mungers.Filter.JSON.And) > 0 || len(m.MQTT.Mungers.Filter.JSON.Or) > 0)
+func (m MQTTMessage) shouldSkip() bool {
+	var f string
+	var ok bool
+
+	if f, ok = m.luaFile(); ok {
+		payload := m.PayloadAsString()
+		return !luaFileExecMatch(payload, f)
+	}
+
+	return false
+}
+
+func (m MQTTMessage) luaFile() (string, bool) {
+	if len(m.MQTT.LUAFile) > 0 {
+		return m.MQTT.LUAFile, true
+	}
+	return "", false
 }
 
 func mQTTConfig() map[string]interface{} {
