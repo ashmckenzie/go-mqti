@@ -154,7 +154,6 @@ func MQTTSubscribe(incoming chan *MQTTMessage) {
 	opts.Username = mQTTUsername()
 	opts.Password = mQTTPassword()
 	opts.CleanSession = mQTTCleanSession()
-	opts.TLSConfig = tls.Config{}
 
 	if mQTTTLSDefined() {
 		opts.TLSConfig = mQTTTLSConfig()
@@ -195,7 +194,7 @@ func MQTTSubscribe(incoming chan *MQTTMessage) {
 	client := MQTT.NewClient(opts)
 
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		panic(token.Error())
+		Log.Panic(token.Error())
 	}
 
 	for {
