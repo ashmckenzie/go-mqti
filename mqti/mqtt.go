@@ -9,7 +9,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/spf13/viper"
 )
@@ -190,7 +189,7 @@ func MQTTSubscribe(incoming chan *MQTTMessage) {
 	}
 
 	opts.OnConnectionLost = func(c MQTT.Client, e error) {
-		spew.Dump(c)
+		Log.Error(e)
 	}
 
 	client := MQTT.NewClient(opts)
