@@ -95,11 +95,13 @@ func mQTTPort() string {
 }
 
 func mQTTProtocol() string {
-	// if mQTTTLSDefined() {
-	// 	return "ssl"
-	// }
-	// return "tcp"
-	return "wss"
+	if p := mQTTConfig()["protocol"]; p != nil {
+		return p.(string)
+}
+	if mQTTTLSDefined() {
+		return "ssl"
+	}
+	return "tcp"
 }
 
 func mQTTClientID() string {
