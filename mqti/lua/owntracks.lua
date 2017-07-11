@@ -135,14 +135,12 @@ function process(i)
 
 	if type(t) == "table" then
 		if t._type and t._type == "location" then
-      t.geohash = GeoHash.encode(t.lat, t.lon)
-      jsonObj.Message = json.encode(t)
-			return jsonObj
+			return jsonObj, { device_id = t.tid, geohash = GeoHash.encode(t.lat, t.lon) }
 		else
-			return nil
+			return nil, {}
 		end
 	else
-		return nil
+		return nil, {}
 	end
 end
 

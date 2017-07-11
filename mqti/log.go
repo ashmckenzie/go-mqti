@@ -80,6 +80,7 @@ func logMQTTMessage(m *MQTTMessage, level logrus.Level) {
 
 	fields := logrus.Fields{
 		"topic":    m.Message.Topic(),
+		"tags":     m.Tags(),
 		"mqtt":     m.Mapping.MQTT,
 		"influxdb": m.Mapping.InfluxDB,
 	}

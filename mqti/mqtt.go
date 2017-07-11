@@ -23,12 +23,14 @@ type MQTTMessage struct {
 	Message MQTT.Message
 	Mapping MappingConfiguration
 	payload string
+	tags    map[string]string
 }
 
 // Message ...
 type Message struct {
 	Topic   string
 	Message string
+	Tags    map[string]string
 }
 
 // MessageAsStruct ...
@@ -36,8 +38,26 @@ func (m MQTTMessage) MessageAsStruct() Message {
 	msg := Message{
 		m.Message.Topic(),
 		string(m.Message.Payload()),
+		m.Tags(),
 	}
 	return msg
+}
+
+// AddTags ...
+func (m *MQTTMessage) AddTags(t map[string]string) {
+	for k, v := range t {
+		m.AddTag(k, v)
+	}
+}
+
+// AddTag ...
+func (m *MQTTMessage) AddTag(k, v string) {
+	m.tags[k] = v
+}
+
+// Tags ...
+func (m MQTTMessage) Tags() map[string]string {
+	return m.tags
 }
 
 // MessageAsJSONString ...
@@ -59,7 +79,6 @@ func (m *MQTTMessage) SetPayload(s string) {
 
 // PayloadAsString ...
 func (m MQTTMessage) PayloadAsString() string {
-	// return string(m.Message.Payload())
 	return m.payload
 }
 
@@ -67,7 +86,6 @@ func (m MQTTMessage) PayloadAsString() string {
 func (m MQTTMessage) PayloadAsJSON() (map[string]interface{}, error) {
 	var fields map[string]interface{}
 
-	// err := json.Unmarshal(m.Message.Payload(), &fields)
 	err := json.Unmarshal([]byte(m.payload), &fields)
 
 	return fields, err
@@ -113,16 +131,18 @@ func MQTTSubscribe(incoming chan *MQTTMessage) {
 			m := mapping
 			var f MQTT.MessageHandler = func(client MQTT.Client, msg MQTT.Message) {
 				var ok bool
+				var tags map[string]string
 				match := false
 
-				mQTTMessage := &MQTTMessage{msg, m, ""}
+				mQTTMessage := &MQTTMessage{msg, m, "", map[string]string{}}
 				message := mQTTMessage.MessageAsStruct()
 				mQTTMessage.SetPayload(message.Message)
 
 				if files, ok = mQTTMessage.luaFiles(); ok {
 					for _, f := range files {
-						message, ok = mQTTMessage.runLuaFile(f)
+						message, tags, ok = mQTTMessage.runLuaFile(f)
 						mQTTMessage.SetPayload(message.Message)
+						mQTTMessage.AddTags(tags)
 						if ok && !match {
 							match = true
 						}
@@ -131,7 +151,7 @@ func MQTTSubscribe(incoming chan *MQTTMessage) {
 					match = true
 				}
 
-				Log.Debugf("match=[%v], message=[%s]", match, mQTTMessage)
+				Log.Debugf("match=[%v], message=[%s], tags[%s]", match, mQTTMessage, tags)
 
 				if match {
 					outgoing <- mQTTMessage
@@ -164,7 +184,7 @@ func (m MQTTMessage) luaFiles() ([]string, bool) {
 	return nil, false
 }
 
-func (m MQTTMessage) runLuaFile(f string) (Message, bool) {
+func (m MQTTMessage) runLuaFile(f string) (Message, map[string]string, bool) {
 	L := lua.NewState()
 	luajson.Preload(L)
 	defer L.Close()
@@ -175,25 +195,36 @@ func (m MQTTMessage) runLuaFile(f string) (Message, bool) {
 
 	str, _ := m.MessageAsJSONString()
 	msg := m.MessageAsStruct()
+	tags := make(map[string]string)
 
 	if err := L.CallByParam(lua.P{
 		Fn:      L.GetGlobal("process"),
-		NRet:    1,
+		NRet:    2,
 		Protect: true,
 	}, lua.LString(str)); err != nil {
 		panic(err)
 	}
 
-	lv := L.Get(-1)
+	lv := L.Get(1)
 	if v, ok := lv.(*lua.LTable); ok {
 		if err := gluamapper.Map(v, &msg); err != nil {
 			Log.Error(err)
-			return msg, false
+			return msg, tags, false
 		}
+
 		Log.Debug(msg)
-		return msg, true
+
+		lv := L.Get(2)
+		if v, ok := lv.(*lua.LTable); ok {
+			v.ForEach(func(k, v lua.LValue) {
+				tags[k.String()] = v.String()
+			})
+		}
+
+		return msg, tags, true
 	}
-	return msg, false
+
+	return msg, tags, false
 }
 
 func mQTTConfig() map[string]interface{} {

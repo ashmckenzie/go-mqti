@@ -41,21 +41,15 @@ func (i InfluxDBConnection) Forward(m *MQTTMessage) error {
 
 	config := m.Mapping.InfluxDB
 
-	tags := config.Tags
-	if tags == nil {
-		tags = make(map[string]string)
-	}
-
 	fields, err = m.PayloadAsJSON()
 	if err != nil {
 		Log.Error(err)
-	} else {
 		fields = map[string]interface{}{"value": m.PayloadAsString()}
 	}
 
 	p := InfluxDBClient.Point{
 		Measurement: config.Measurement,
-		Tags:        tags,
+		Tags:        m.Tags(),
 		Fields:      fields,
 		Time:        time.Now(),
 	}
