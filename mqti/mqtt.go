@@ -141,10 +141,13 @@ func MQTTSubscribe(incoming chan *MQTTMessage) {
 				if files, ok = mQTTMessage.luaFiles(); ok {
 					for _, f := range files {
 						message, tags, ok = mQTTMessage.runLuaFile(f)
-						mQTTMessage.SetPayload(message.Message)
-						mQTTMessage.AddTags(tags)
-						if ok && !match {
-							match = true
+
+						if ok {
+							mQTTMessage.SetPayload(message.Message)
+							mQTTMessage.AddTags(tags)
+							if !match {
+								match = true
+							}
 						}
 					}
 				} else {
@@ -214,6 +217,7 @@ func (m MQTTMessage) runLuaFile(f string) (Message, map[string]string, bool) {
 
 		Log.Debug(msg)
 
+		// Tags
 		lv := L.Get(2)
 		if v, ok := lv.(*lua.LTable); ok {
 			v.ForEach(func(k, v lua.LValue) {
