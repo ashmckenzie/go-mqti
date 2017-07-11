@@ -22,3 +22,4 @@ tmp/
 reports
 mqti/config*.toml
 mqti/config*.yaml
+.vscode

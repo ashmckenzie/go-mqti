@@ -76,11 +76,12 @@ func DebugLogMQTTMessage(m *MQTTMessage) {
 }
 
 func logMQTTMessage(m *MQTTMessage, level logrus.Level) {
-	payload := string(m.Payload())
+	payload := m.PayloadAsString()
+
 	fields := logrus.Fields{
-		"topic":    m.Topic(),
-		"mqtt":     m.MappingConfiguration.MQTT,
-		"influxdb": m.MappingConfiguration.InfluxDB,
+		"topic":    m.Message.Topic(),
+		"mqtt":     m.Mapping.MQTT,
+		"influxdb": m.Mapping.InfluxDB,
 	}
 
 	switch level {

@@ -6,7 +6,6 @@ import (
 	"time"
 
 	InfluxDBClient "github.com/influxdata/influxdb/client"
-	"github.com/mmcloughlin/geohash"
 	"github.com/spf13/viper"
 )
 
@@ -15,46 +14,24 @@ type InfluxDBConnection struct {
 	*InfluxDBClient.Client
 }
 
-func (i InfluxDBConnection) geoHashFieldsDefined(g GeohashMungerConfiguration) bool {
-	return len(g.LatitudeField) > 0 && len(g.LongitudeField) > 0 && len(g.ResultField) > 0
-}
-
-func (i InfluxDBConnection) applyGeohashMunger(g GeohashMungerConfiguration, fields map[string]interface{}, tags map[string]string) error {
-	if i.geoHashFieldsDefined(g) {
-		tags[g.ResultField] = geohash.Encode(
-			fields[g.LatitudeField].(float64),
-			fields[g.LongitudeField].(float64))
-	}
-
-	return nil
-}
-
-func (i InfluxDBConnection) applyTagsMunger(t TagsMungerConfiguration, fields map[string]interface{}, tags map[string]string) error {
-	for _, x := range t.From {
-		for k, v := range x {
-			if fields[k] != nil {
-				tags[v] = fields[k].(string)
-			}
-		}
-	}
-	return nil
-}
-
-func (i InfluxDBConnection) applyMungers(m struct {
-	Tags    TagsMungerConfiguration
-	Geohash GeohashMungerConfiguration
-}, fields map[string]interface{}, tags map[string]string) error {
+// NewInfluxDBConnection ...
+func NewInfluxDBConnection() (*InfluxDBConnection, error) {
 	var err error
+	var influxDBConn *InfluxDBClient.Client
 
-	if err = i.applyGeohashMunger(m.Geohash, fields, tags); err != nil {
-		Log.Warn(err)
+	opts := InfluxDBClient.Config{URL: *influxDBURI()}
+
+	if influxDBUsername() != "" && influxDBPassword() != "" {
+		opts.Username = influxDBUsername()
+		opts.Password = influxDBPassword()
 	}
 
-	if err = i.applyTagsMunger(m.Tags, fields, tags); err != nil {
-		Log.Warn(err)
+	influxDBConn, err = InfluxDBClient.NewClient(opts)
+	if err != nil {
+		return nil, err
 	}
 
-	return err
+	return &InfluxDBConnection{influxDBConn}, nil
 }
 
 // Forward ...
@@ -62,7 +39,7 @@ func (i InfluxDBConnection) Forward(m *MQTTMessage) error {
 	var err error
 	var fields map[string]interface{}
 
-	config := m.MappingConfiguration.InfluxDB
+	config := m.Mapping.InfluxDB
 
 	tags := config.Tags
 	if tags == nil {
@@ -70,11 +47,8 @@ func (i InfluxDBConnection) Forward(m *MQTTMessage) error {
 	}
 
 	fields, err = m.PayloadAsJSON()
-	if err == nil {
-		mungers := m.MappingConfiguration.InfluxDB.Mungers
-		if err = i.applyMungers(mungers, fields, tags); err != nil {
-			Log.Warn(err)
-		}
+	if err != nil {
+		Log.Error(err)
 	} else {
 		fields = map[string]interface{}{"value": m.PayloadAsString()}
 	}
@@ -90,7 +64,7 @@ func (i InfluxDBConnection) Forward(m *MQTTMessage) error {
 
 	_, err = i.Write(InfluxDBClient.BatchPoints{
 		Points:   []InfluxDBClient.Point{p},
-		Database: m.MappingConfiguration.InfluxDB.Database,
+		Database: m.Mapping.InfluxDB.Database,
 	})
 
 	return err
@@ -127,24 +101,4 @@ func influxDBPassword() string {
 		return p.(string)
 	}
 	return ""
-}
-
-// NewInfluxDBConnection ...
-func NewInfluxDBConnection() (*InfluxDBConnection, error) {
-	var err error
-	var influxDBConn *InfluxDBClient.Client
-
-	opts := InfluxDBClient.Config{URL: *influxDBURI()}
-
-	if influxDBUsername() != "" && influxDBPassword() != "" {
-		opts.Username = influxDBUsername()
-		opts.Password = influxDBPassword()
-	}
-
-	influxDBConn, err = InfluxDBClient.NewClient(opts)
-	if err != nil {
-		return nil, err
-	}
-
-	return &InfluxDBConnection{influxDBConn}, nil
 }

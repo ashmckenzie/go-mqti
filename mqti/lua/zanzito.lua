@@ -134,8 +134,8 @@ function process(i)
 	local s, t  = pcall(decodeMessage, jsonObj)
 
 	if type(t) == "table" then
-		if t._type and t._type == "location" then
-      t.geohash = GeoHash.encode(t.lat, t.lon)
+		if t.longitude and t.latitude then
+      t.geohash = GeoHash.encode(t.longitude, t.latitude)
       jsonObj.Message = json.encode(t)
 			return jsonObj
 		else
@@ -145,5 +145,4 @@ function process(i)
 		return nil
 	end
 end
-
 
